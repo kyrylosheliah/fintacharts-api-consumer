@@ -13,28 +13,58 @@ record class TokenResponse
 
     [JsonPropertyName("expires_in")]
     public int ExpiresIn { get; set; }
+
+    [JsonIgnore]
+    public DateTime ExpiryTime { get; set; } = DateTime.MinValue;
 }
 
 public class TokenService
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
-    private TokenResponse? _tokenCache;
+    private TokenResponse? _tokenCache = null;
+    private string _tokenUrl;
 
-    public TokenService(HttpClient httpClient, IConfiguration configuration)
+    public TokenService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient();
         _configuration = configuration;
+        _tokenUrl = $"{_configuration["Auth:Uri"]}/identity/realms/{_configuration["Auth:Realm"]}/protocol/openid-connect/token";
     }
 
     public async Task<string?> GetAccessTokenAsync()
     {
-        if (_tokenCache != null && !string.IsNullOrEmpty(_tokenCache.AccessToken))
-            return _tokenCache.AccessToken;
+        if (_tokenCache != null)
+        {
+            Console.WriteLine("### token cached");
+            Console.WriteLine(_tokenCache.ExpiresIn);
+            Console.WriteLine(_tokenCache.ExpiryTime);
+            if (_tokenCache.ExpiryTime > DateTime.UtcNow.AddMinutes(5))
+            {
+                //&& !string.IsNullOrEmpty(_tokenCache.AccessToken)
+                return _tokenCache.AccessToken;
+            }
+            if (!string.IsNullOrEmpty(_tokenCache.RefreshToken))
+            {
+                var refresh_success = await TryRefreshTokenAsync(_tokenCache.RefreshToken);
+                if (refresh_success)
+                {
+                    return _tokenCache?.AccessToken;
+                }
+            }
+        }
 
-        var realm = "fintatech";
-        var tokenUrl = $"{_configuration["Auth:Uri"]}/identity/realms/{realm}/protocol/openid-connect/token";
+        var request_success = await TryRequestTokenAsync();
+        if (request_success)
+        {
+            return _tokenCache?.AccessToken;
+        }
 
+        return null;
+    }
+
+    private async Task<bool> TryRequestTokenAsync()
+    {
         var content = new FormUrlEncodedContent(
         [
             new("grant_type", "password"),
@@ -43,15 +73,40 @@ public class TokenService
             new("password", _configuration["Auth:Password"])
         ]);
 
-        var response = await _httpClient.PostAsync(tokenUrl, content);
-        response.EnsureSuccessStatusCode();
+        var response = await _httpClient.PostAsync(_tokenUrl, content);
+        if (!response.IsSuccessStatusCode)
+            return false;
 
         var json = await response.Content.ReadAsStringAsync();
         _tokenCache = JsonSerializer.Deserialize<TokenResponse>(json);
 
-        Console.WriteLine("Access token:");
-        Console.WriteLine(_tokenCache?.AccessToken);
+        return true;
+    }
 
-        return _tokenCache?.AccessToken;
+    private async Task<bool> TryRefreshTokenAsync(string refreshToken)
+    {
+        var content = new FormUrlEncodedContent(
+        [
+            new("grant_type", "refresh_token"),
+            new("client_id", "app-cli"),
+            new("refresh_token", refreshToken)
+        ]);
+
+        var response = await _httpClient.PostAsync(_tokenUrl, content);
+        if (!response.IsSuccessStatusCode)
+            return false;
+
+        var json = await response.Content.ReadAsStringAsync();
+        var newToken = JsonSerializer.Deserialize<TokenResponse>(json);
+        if (newToken == null)
+            return false;
+
+        newToken.ExpiryTime = DateTime.UtcNow.AddSeconds(newToken.ExpiresIn);
+        Console.WriteLine("### ExpiryTime");
+        Console.WriteLine(newToken.ExpiryTime);
+        Console.WriteLine(newToken.ExpiresIn);
+        _tokenCache = newToken;
+
+        return true;
     }
 }

@@ -7,11 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
 var AUTH_URI = Environment.GetEnvironmentVariable("AUTH_URI");
+var AUTH_REALM = Environment.GetEnvironmentVariable("AUTH_REALM");
 var AUTH_USERNAME = Environment.GetEnvironmentVariable("AUTH_USERNAME");
 var AUTH_PASSWORD = Environment.GetEnvironmentVariable("AUTH_PASSWORD");
 var WSS_URI = Environment.GetEnvironmentVariable("WSS_URI");
 if (
     string.IsNullOrEmpty(AUTH_URI)
+    || string.IsNullOrEmpty(AUTH_REALM)
     || string.IsNullOrEmpty(AUTH_USERNAME)
     || string.IsNullOrEmpty(AUTH_PASSWORD)
     || string.IsNullOrEmpty(WSS_URI)
@@ -21,6 +23,7 @@ if (
 builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 {
     {"Auth:Uri", AUTH_URI},
+    {"Auth:Realm", AUTH_REALM},
     {"Auth:Username", AUTH_USERNAME},
     {"Auth:Password", AUTH_PASSWORD},
 });
@@ -49,7 +52,8 @@ builder.Services.AddCors(options =>
 // WebSocket connections
 builder.Services.AddSignalR();
 
-builder.Services.AddHttpClient<TokenService>();
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<TokenService>();
 builder.Services.AddSingleton<MarketQuoteCache>();
 builder.Services.AddSingleton<QuestDBClient>();
 //builder.Services.AddSingleton<FintachartsService>(client =>
