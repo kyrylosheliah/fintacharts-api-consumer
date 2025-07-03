@@ -1,0 +1,51 @@
+services:
+  questdb:
+    image: questdb/questdb
+    container_name: fintacharts-questdb
+    ports:
+      - "9000:9000" # web console
+      - "9009:9009" # InfluxDB line protocol
+      - "9009:9009" # PostgreSQL wire protocol
+    volumes:
+      - ./questdb_data:/root/.questdb
+    environment:
+      - QDB_CAIRO_SQL_COPY_BUFFER_SIZE=2097152
+    networks:
+      - fintacharts_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    container_name: fintacharts-backend-dotnet
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      - questdb
+    networks:
+      - fintacharts_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fintacharts-frotnend-solid
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:5000
+      - VITE_WS_URL=ws://localhost:5000/ws
+    depends_on:
+      - backend
+    networkds:
+      - fintacharts_network
+
+volumes:
+  questdb_data:
+
+networks:
+  fintacharts_network:
+    driver: bridge
