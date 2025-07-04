@@ -4,8 +4,8 @@ namespace BackendDotnet.Data;
 
 public class MarketQuoteCache
 {
-    private readonly Dictionary<string, MarketQuote> _cache = new();
-    private readonly object _lock = new();
+    private readonly Dictionary<string, MarketQuote> _cache = [];
+    private readonly Lock _lock = new();
 
     public void Update(string symbol, decimal bid, decimal ask, decimal last)
     {

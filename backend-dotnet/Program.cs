@@ -11,12 +11,14 @@ var AUTH_REALM = Environment.GetEnvironmentVariable("AUTH_REALM");
 var AUTH_USERNAME = Environment.GetEnvironmentVariable("AUTH_USERNAME");
 var AUTH_PASSWORD = Environment.GetEnvironmentVariable("AUTH_PASSWORD");
 var WSS_URI = Environment.GetEnvironmentVariable("WSS_URI");
+var QUESTDB_CONNECTION_STRING = Environment.GetEnvironmentVariable("QUESTDB_CONNECTION_STRING");
 if (
     string.IsNullOrEmpty(AUTH_URI)
     || string.IsNullOrEmpty(AUTH_REALM)
     || string.IsNullOrEmpty(AUTH_USERNAME)
     || string.IsNullOrEmpty(AUTH_PASSWORD)
     || string.IsNullOrEmpty(WSS_URI)
+    || string.IsNullOrEmpty(QUESTDB_CONNECTION_STRING)
 ) {
     throw new InvalidOperationException($"Missing required environment variables");
 }
@@ -26,6 +28,8 @@ builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
     {"Auth:Realm", AUTH_REALM},
     {"Auth:Username", AUTH_USERNAME},
     {"Auth:Password", AUTH_PASSWORD},
+    {"Wss:Uri", WSS_URI},
+    {"QuestDB:ConnectionString", QUESTDB_CONNECTION_STRING},
 });
 
 // Add services to the container.
