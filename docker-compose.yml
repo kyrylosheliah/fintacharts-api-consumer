@@ -1,38 +1,40 @@
 services:
-  questdb:
-    image: questdb/questdb
-    container_name: fintacharts-questdb
+  timescaledb:
+    build:
+      context: ./timescaledb
+      dockerfile: Dockerfile
+    container_name: finta-timescaledb
     ports:
-      - "9000:9000" # web console
-      - "9009:9009" # InfluxDB line protocol
-      - "9009:9009" # PostgreSQL wire protocol
-    volumes:
-      - ./questdb_data:/root/.questdb
+      - "5432:5432"
     environment:
-      - QDB_CAIRO_SQL_COPY_BUFFER_SIZE=2097152
+      POSTGRES_DB: AssetMarket
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pg_data:/var/lib/postgresql/data
     networks:
-      - fintacharts_network
+      - finta_network
 
   backend:
     build:
       context: ./backend
       dockerfile: dockerfile
-    container_name: fintacharts-backend-dotnet
+    container_name: finta-backend-dotnet
     ports:
       - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
     depends_on:
-      - questdb
+      - timescaledb
     networks:
-      - fintacharts_network
+      - finta_network
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: fintacharts-frotnend-solid
+    container_name: finta-frotnend-solid
     ports:
       - "3000:3000"
     environment:
@@ -41,11 +43,11 @@ services:
     depends_on:
       - backend
     networkds:
-      - fintacharts_network
+      - finta_network
 
 volumes:
-  questdb_data:
+  pg_data:
 
 networks:
-  fintacharts_network:
+  finta_network:
     driver: bridge

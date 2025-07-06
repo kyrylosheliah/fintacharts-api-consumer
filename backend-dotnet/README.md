@@ -1,6 +1,6 @@
 `.env` file:
 ```
-AUTH_URI=https://your-host.com
+BASE_URI=https://your-host.com
 AUTH_REALM=abcd
 AUTH_USERNAME=myuser
 AUTH_PASSWORD=mypassword

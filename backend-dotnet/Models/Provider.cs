@@ -2,8 +2,13 @@ namespace BackendDotnet.Models;
 
 public class Provider
 {
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public List<string> SupportedMarkets { get; set; } = new();
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public List<string> SupportedMarkets { get; set; } = [];
+}
+
+public class ProviderResponse
+{
+    public List<string> Data { get; set; } = [];
 }

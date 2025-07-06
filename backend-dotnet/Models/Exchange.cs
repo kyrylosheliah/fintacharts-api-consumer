@@ -8,3 +8,8 @@ public class Exchange
     public string Timezone { get; set; } = string.Empty;
     public string Currency { get; set; } = string.Empty;
 }
+
+public class ExchangeResponse
+{
+    public Dictionary<string, List<string>> Data { get; set; } = [];
+}

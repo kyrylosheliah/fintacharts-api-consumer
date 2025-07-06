@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace BackendDotnet.Services;
 
-record class TokenResponse
+record TokenResponse
 {
     [JsonPropertyName("access_token")]
     public string AccessToken { get; set; } = "";
@@ -18,19 +18,11 @@ record class TokenResponse
     public DateTime ExpiryTime { get; set; } = DateTime.MinValue;
 }
 
-public class TokenService
+public class AuthTokenService(IHttpClientFactory httpClientFactory, IConfiguration _configuration)
 {
-    private readonly HttpClient _httpClient;
-    private readonly IConfiguration _configuration;
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
     private TokenResponse? _tokenCache = null;
-    private string _tokenUrl;
-
-    public TokenService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
-    {
-        _httpClient = httpClientFactory.CreateClient();
-        _configuration = configuration;
-        _tokenUrl = $"{_configuration["Auth:Uri"]}/identity/realms/{_configuration["Auth:Realm"]}/protocol/openid-connect/token";
-    }
+    private readonly string _tokenUrl = $"{_configuration["Base:Uri"]}/identity/realms/{_configuration["Auth:Realm"]}/protocol/openid-connect/token";
 
     public async Task<string?> GetAccessTokenAsync()
     {
@@ -39,7 +31,7 @@ public class TokenService
             Console.WriteLine("### token cached");
             Console.WriteLine(_tokenCache.ExpiresIn);
             Console.WriteLine(_tokenCache.ExpiryTime);
-            if (_tokenCache.ExpiryTime > DateTime.UtcNow.AddMinutes(5))
+            if (_tokenCache.ExpiryTime > DateTime.UtcNow.AddMinutes(1))
             {
                 //&& !string.IsNullOrEmpty(_tokenCache.AccessToken)
                 return _tokenCache.AccessToken;
