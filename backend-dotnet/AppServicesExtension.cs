@@ -87,7 +87,8 @@ public static class AppServicesExtension
         builder.Services.AddSignalR(); // WebSocket connections
         builder.Services.AddHttpClient();
         builder.Services.AddSingleton<AuthTokenService>();
-        builder.Services.AddSingleton<SymbolMarketBarCache>();
+        builder.Services.AddSingleton<AssetCache>();
+        builder.Services.AddSingleton<SymbolBarCache>();
         builder.Services.AddSingleton<QuestDBClient>();
         builder.Services.AddTransient<MarketService>();
     }

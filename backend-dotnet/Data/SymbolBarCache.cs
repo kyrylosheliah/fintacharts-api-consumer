@@ -3,7 +3,7 @@ using BackendDotnet.Models;
 
 namespace BackendDotnet.Data;
 
-public class SymbolMarketBarCache
+public class SymbolBarCache
 {
     private readonly Dictionary<string, MarketBar> _cache = [];
     private readonly Lock _lock = new();

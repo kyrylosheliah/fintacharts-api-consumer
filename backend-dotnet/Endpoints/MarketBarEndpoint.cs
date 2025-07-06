@@ -15,6 +15,9 @@ public class MarketBarEndpoint : IEndpoint
             .MapGet("/health", GetHealth)
             .WithSummary("Get the operational status for the endpoint group");
         group
+            .MapGet("/assets", GetAssets)
+            .WithSummary("Get a filtered instrument list");
+        group
             .MapGet("/bars", GetSymbolBars)
             .WithSummary("Get the aggregated bar data for the specified symbol");
         group
@@ -30,6 +33,18 @@ public class MarketBarEndpoint : IEndpoint
         return Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
     }
 
+    public static async Task<IResult> GetAssets(
+        string? symbol,
+        int? page,
+        int? size,
+        string? provider,
+        AssetCache assetCache
+    )
+    {
+        var instruments = await assetCache.GetInstruments(symbol, page, size, provider);
+        return Results.Ok(instruments);
+    }
+
     private static async Task<IResult> GetSymbolBars(
         string symbol,
         string timeRange,
@@ -42,7 +57,7 @@ public class MarketBarEndpoint : IEndpoint
 
     public static async Task<IResult> GetSymbolBar(
         string symbol,
-        SymbolMarketBarCache cache,
+        SymbolBarCache cache,
         QuestDBClient dbClient
     )
     {
