@@ -22,7 +22,7 @@ public class AuthTokenService(IHttpClientFactory httpClientFactory, IConfigurati
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
     private TokenResponse? _tokenCache = null;
-    private readonly string _tokenUrl = $"{_configuration["Base:Uri"]}/identity/realms/{_configuration["Auth:Realm"]}/protocol/openid-connect/token";
+    private readonly string _tokenUrl = $"{_configuration["Base:Url"]}/identity/realms/{_configuration["Auth:Realm"]}/protocol/openid-connect/token";
 
     public async Task<string?> GetAccessTokenAsync()
     {

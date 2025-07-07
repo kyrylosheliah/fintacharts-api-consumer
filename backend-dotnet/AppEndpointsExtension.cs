@@ -1,6 +1,5 @@
 using BackendDotnet.Filters;
 using BackendDotnet.Endpoints;
-using BackendDotnet.Models;
 
 namespace BackendDotnet;
 

@@ -30,7 +30,7 @@ public class AssetCache
         _tokenService = tokenService;
         _configuration = configuration;
         _httpClient = httpClient;
-        _baseUri = _configuration["Base:Uri"] ?? "";
+        _baseUri = _configuration["Base:Url"] ?? "";
         _ = LoadProviders();
         _ = LoadExchanges();
     }
