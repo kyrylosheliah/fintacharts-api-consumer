@@ -27,6 +27,6 @@ public static class AppEndpointsExtension {
     private static void MapMarketBarEndpoints(this IEndpointRouteBuilder app) {
         app
             .MapPublicGroup()
-            .MapEndpoint<MarketBarEndpoint>();
+            .MapEndpoint<MarketBarEndpoints>();
     }
 }

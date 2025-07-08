@@ -18,19 +18,16 @@ record TokenResponse
     public DateTime ExpiryTime { get; set; } = DateTime.MinValue;
 }
 
-public class AuthTokenService(IHttpClientFactory httpClientFactory, IConfiguration _configuration)
+public class AuthTokenService(IHttpClientFactory httpClientFactory, IConfiguration _config)
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
     private TokenResponse? _tokenCache = null;
-    private readonly string _tokenUrl = $"{_configuration["Base:Url"]}/identity/realms/{_configuration["Auth:Realm"]}/protocol/openid-connect/token";
+    private readonly string _tokenUrl = $"{_config["Base:Url"]}/identity/realms/{_config["Auth:Realm"]}/protocol/openid-connect/token";
 
     public async Task<string?> GetAccessTokenAsync()
     {
         if (_tokenCache != null)
         {
-            Console.WriteLine("### token cached");
-            Console.WriteLine(_tokenCache.ExpiresIn);
-            Console.WriteLine(_tokenCache.ExpiryTime);
             if (_tokenCache.ExpiryTime > DateTime.UtcNow.AddMinutes(1))
             {
                 //&& !string.IsNullOrEmpty(_tokenCache.AccessToken)
@@ -61,8 +58,8 @@ public class AuthTokenService(IHttpClientFactory httpClientFactory, IConfigurati
         [
             new("grant_type", "password"),
             new("client_id", "app-cli"),
-            new("username", _configuration["Auth:Username"]),
-            new("password", _configuration["Auth:Password"])
+            new("username", _config["Auth:Username"]),
+            new("password", _config["Auth:Password"])
         ]);
 
         var response = await _httpClient.PostAsync(_tokenUrl, content);
@@ -94,9 +91,6 @@ public class AuthTokenService(IHttpClientFactory httpClientFactory, IConfigurati
             return false;
 
         newToken.ExpiryTime = DateTime.UtcNow.AddSeconds(newToken.ExpiresIn);
-        Console.WriteLine("### ExpiryTime");
-        Console.WriteLine(newToken.ExpiryTime);
-        Console.WriteLine(newToken.ExpiresIn);
         _tokenCache = newToken;
 
         return true;

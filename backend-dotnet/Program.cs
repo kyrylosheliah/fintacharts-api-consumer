@@ -2,14 +2,13 @@ using Serilog;
 using BackendDotnet;
 using BackendDotnet.Data;
 using Microsoft.AspNetCore.Http.Json;
-using System.Text.Json;
 using BackendDotnet.Services;
 using BackendDotnet.Helpers;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();
-    
+
 void AddServices(WebApplicationBuilder builder)
 {
     builder.Services.AddCors();
@@ -41,7 +40,6 @@ void AddServices(WebApplicationBuilder builder)
     // add json options
     builder.Services.Configure<JsonOptions>(options =>
     {
-        options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         options.SerializerOptions.PropertyNameCaseInsensitive = true;
     });
     // add logger
@@ -50,21 +48,20 @@ void AddServices(WebApplicationBuilder builder)
         configuration.ReadFrom.Configuration(context.Configuration);
     });
     // inject data services
-    builder.Services.AddSignalR(); // WebSocket connections
     builder.Services.AddHttpClient();
     builder.Services.AddSingleton<AuthTokenService>();
     builder.Services.AddSingleton<AssetCache>();
-    builder.Services.AddSingleton<SymbolBarCache>();
-    builder.Services.AddSingleton<QuestDBClient>();
-    builder.Services.AddTransient<MarketService>();
+    //builder.Services.AddSingleton<QuestDBClient>();
+    builder.Services.AddSingleton<QuoteWebSocketRelayService>();
+    builder.Services.AddTransient<AssetService>();
 }
 
-async Task Configure(WebApplication app)
+void Configure(WebApplication app)
 {
-    // ensure database schema
-    using var scope = app.Services.CreateScope();
-    var dbClient = scope.ServiceProvider.GetRequiredService<QuestDBClient>();
-    await dbClient.EnsureSchema();
+    //// ensure database schema
+    //using var scope = app.Services.CreateScope();
+    //var dbClient = scope.ServiceProvider.GetRequiredService<QuestDBClient>();
+    //await dbClient.EnsureSchema();
     // interactive endpoints
     if (app.Environment.IsDevelopment())
     {
@@ -81,7 +78,8 @@ async Task Configure(WebApplication app)
         .AllowAnyMethod()
         .AllowAnyHeader()
     );
-    //app.UseHttpsRedirection();
+    // web sockets
+    app.UseWebSockets();
 }
 
 try
@@ -90,7 +88,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
     AddServices(builder);
     var app = builder.Build();
-    await Configure(app);
+    Configure(app);
     app.MapEndpoints();
     app.Run();
 }

@@ -1,6 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace BackendDotnet.Models;
 
 public record ExchangeResponse
 {
-    public Dictionary<string, List<string>> Data { get; set; } = [];
+    [JsonPropertyName("data")] public Dictionary<string, List<string>> Data { get; set; } = [];
 }
