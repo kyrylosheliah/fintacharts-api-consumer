@@ -31,15 +31,13 @@ services:
 
   frontend:
     build:
-      context: ./frontend-solid
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./frontend-solid/Dockerfile
     container_name: finta-frotnend-solid
     ports:
       - "3000:3000"
     depends_on:
       - backend
-    env_file:
-      - .env
     networks:
       - finta_network
 

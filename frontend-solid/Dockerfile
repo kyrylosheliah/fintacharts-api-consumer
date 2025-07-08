@@ -1,6 +1,7 @@
 FROM node:22
 WORKDIR /app
-COPY . ./
+COPY ./frontend-solid/ ./
+COPY .env .env
 RUN npm i
 RUN npm run build
 EXPOSE 3000

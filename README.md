@@ -13,7 +13,6 @@ AUTH_REALM=abcd
 AUTH_USERNAME=myuser
 AUTH_PASSWORD=mypassword
 WSS_URI=wss://your-host.com
-QUESTDB_CONNECTION_STRING='http::addr=127.0.0.1:9000;username=admin;password=quest;'
 QUESTDB_PROTOCOL=http
 QUESTDB_URL=localhost:9000
 QUESTDB_USERNAME=admin
@@ -27,7 +26,8 @@ Run the apps via Docker
 docker compose up --build
 ```
 
-Browse backend REST endpoints on `http://localhost:5000/swagger`
+(Development mode) Browse backend REST endpoints on `http://localhost:5000/swagger`
+
 Browse frontend client on `http://localhost:3000` and `http://localhost:3000/symbol/ABC`
 
 Run the backend manually
@@ -37,7 +37,6 @@ dotnet restore
 dotnet build -c Release -o out
 dotnet ./out/backend-dotnet.dll
 ```
-
 
 Run the frontend manually
 ```
