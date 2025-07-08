@@ -137,13 +137,13 @@ public class QuoteWebSocketRelayService(
                     _clients.Remove(clientSocket);
                     await clientSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnected", CancellationToken.None);
 
-                    if (_clients.Count == 0 && _backendSocket != null)
-                    {
-                        _cts?.Cancel();
-                        await _backendSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "No clients", CancellationToken.None);
-                        _backendSocket.Dispose();
-                        _backendSocket = null;
-                    }
+                    // if (_clients.Count == 0 && _backendSocket != null)
+                    // {
+                    //     _cts?.Cancel();
+                    //     await _backendSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "No clients", CancellationToken.None);
+                    //     _backendSocket.Dispose();
+                    //     _backendSocket = null;
+                    // }
                 }
                 finally
                 {

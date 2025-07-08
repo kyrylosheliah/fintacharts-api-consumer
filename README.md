@@ -24,8 +24,11 @@ VITE_BACKEND=http://localhost:5000
 
 Run the apps via Docker
 ```
-docker-compose up --build
+docker compose up --build
 ```
+
+Browse backend REST endpoints on `http://localhost:5000/swagger`
+Browse frontend client on `http://localhost:3000` and `http://localhost:3000/symbol/ABC`
 
 Run the backend manually
 ```
@@ -35,7 +38,6 @@ dotnet build -c Release -o out
 dotnet ./out/backend-dotnet.dll
 ```
 
-Browse backend REST endpoints on `http://localhost:5000/swagger`
 
 Run the frontend manually
 ```
@@ -43,5 +45,3 @@ cd frontend-solid
 npm run build
 npm run preview
 ```
-
-Browse frontend client on `http://localhost:3000` and `http://localhost:3000/symbol/BTC`

@@ -13,9 +13,9 @@ export function useSymbolStats(
   const [history, setHistory] = createSignal<IMarketBar[]>([]);
   var socket: WebSocket = undefined!;
   const socketUrl = `${backendUrl}/api/v1/asset/ws/${symbol}`;
-  const [ask, setAsk] = createSignal<IQuoteUpdate>();
-  const [bid, setBid] = createSignal<IQuoteUpdate>();
-  const [last, setLast] = createSignal<IQuoteUpdate>();
+  const [ask, setAsk] = createSignal<IQuoteUpdate | undefined>();
+  const [bid, setBid] = createSignal<IQuoteUpdate | undefined>();
+  const [last, setLast] = createSignal<IQuoteUpdate | undefined>();
 
   const handleSocket = () => {
     socket = new WebSocket(socketUrl);
